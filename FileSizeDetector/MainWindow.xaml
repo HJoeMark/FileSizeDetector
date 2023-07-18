@@ -1,0 +1,73 @@
+﻿<Window x:Class="FileSizeDetector.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileSizeDetector"
+        xmlns:converters="clr-namespace:FileSizeDetector.Converters"
+        mc:Ignorable="d"
+        Title="File size detector" Height="350" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:ByteToMegaByteStringConverter x:Key="ByteToMegaByteStringConverter" />
+        <converters:ByteToGigaByteStringConverter x:Key="ByteToGigaByteStringConverter" />
+
+        <HierarchicalDataTemplate DataType="{x:Type local:FolderOrFile}" ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Name}" Margin="5">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFolder}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding Size, Converter={StaticResource ByteToMegaByteStringConverter}}" Margin="5">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFolder}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding Size, Converter={StaticResource ByteToGigaByteStringConverter}}" Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}}" Margin="5"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+
+
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Content="Select drive:" Margin="10" FontSize="36" />
+            <ComboBox Name="drive_cbox"  Grid.Row="1" Margin="10" FontSize="36" />
+            <Button Name="start_btn"  Grid.Row="2" Content="Start" Click="start_btn_Click"  Margin="10" FontSize="36"/>
+            <Label Name="status_label" Grid.Row="3" Content="Status: Ready" Margin="10" FontSize="36" />
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button x:Name="orderBy_btn" Content="Order by size" Margin="10" FontSize="36" Click="orderBy_btn_Click"></Button>
+            <TreeView Name="treeView" Grid.Row="1"/>
+        </Grid>
+
+    </Grid>
+</Window>
