@@ -16,10 +16,11 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:ByteToMegaByteStringConverter x:Key="ByteToMegaByteStringConverter" />
         <converters:ByteToGigaByteStringConverter x:Key="ByteToGigaByteStringConverter" />
+        <converters:PathToNameConverter x:Key="PathToNameConverter" />
 
         <HierarchicalDataTemplate DataType="{x:Type local:FolderOrFile}" ItemsSource="{Binding Children}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name}" Margin="5">
+                <TextBlock Text="{Binding Path, Converter={StaticResource PathToNameConverter}}" Margin="5">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
@@ -69,7 +70,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Button x:Name="orderBy_btn" Content="Order by size" Margin="10" Click="orderBy_btn_Click"></Button>
-            <TreeView Name="treeView" Grid.Row="1"/>
+            <TreeView Name="treeView" Grid.Row="1" FontSize="16"/>
         </Grid>
 
     </Grid>

@@ -37,8 +37,6 @@ namespace FileSizeDetector
             InitializeComponent();
             Init();
         }
-
-
         private List<string> GetDrives()
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
@@ -90,7 +88,7 @@ namespace FileSizeDetector
                 foreach (var filePath in Directory.GetFiles(startPath))
                 {
                     FileInfo fileInfo = new FileInfo(filePath);
-                    result.Add(new FolderOrFile(false, fileInfo.Name, fileInfo.FullName, fileInfo.Length, null));
+                    result.Add(new FolderOrFile(false, fileInfo.FullName, fileInfo.Length, null));
                     filesSize += fileInfo.Length;
                 }
 
@@ -98,7 +96,7 @@ namespace FileSizeDetector
                 {
                     DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
                     var children = Search(directoryPath, level + 1, out long childrenSize);
-                    result.Add(new FolderOrFile(true, directoryInfo.Name, directoryInfo.FullName, childrenSize, children));
+                    result.Add(new FolderOrFile(true, directoryInfo.FullName, childrenSize, children));
                     directoriesSize += childrenSize;
                 }
 
