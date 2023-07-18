@@ -6,8 +6,13 @@
         xmlns:local="clr-namespace:FileSizeDetector"
         xmlns:converters="clr-namespace:FileSizeDetector.Converters"
         mc:Ignorable="d"
-        Title="File size detector" Height="350" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="File size detector" Height="350" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        FontSize="36"
+        >
     <Window.Resources>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="FontSize" Value="36" />
+        </Style>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <converters:ByteToMegaByteStringConverter x:Key="ByteToMegaByteStringConverter" />
         <converters:ByteToGigaByteStringConverter x:Key="ByteToGigaByteStringConverter" />
@@ -39,8 +44,6 @@
                 <TextBlock Text="{Binding Size, Converter={StaticResource ByteToGigaByteStringConverter}}" Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}}" Margin="5"/>
             </StackPanel>
         </HierarchicalDataTemplate>
-
-
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -55,17 +58,17 @@
                 <RowDefinition Height="80"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="Select drive:" Margin="10" FontSize="36" />
-            <ComboBox Name="drive_cbox"  Grid.Row="1" Margin="10" FontSize="36" />
-            <Button Name="start_btn"  Grid.Row="2" Content="Start" Click="start_btn_Click"  Margin="10" FontSize="36"/>
-            <Label Name="status_label" Grid.Row="3" Content="Status: Ready" Margin="10" FontSize="36" />
+            <Label Grid.Row="0" Content="Select drive:" Margin="10" />
+            <ComboBox Name="drive_cbox"  Grid.Row="1" Margin="10" />
+            <Button Name="start_btn"  Grid.Row="2" Content="Start" Click="start_btn_Click"  Margin="10"/>
+            <Label Name="status_label" Grid.Row="3" Content="Status: Ready" Margin="10" />
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="80"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Button x:Name="orderBy_btn" Content="Order by size" Margin="10" FontSize="36" Click="orderBy_btn_Click"></Button>
+            <Button x:Name="orderBy_btn" Content="Order by size" Margin="10" Click="orderBy_btn_Click"></Button>
             <TreeView Name="treeView" Grid.Row="1"/>
         </Grid>
 
