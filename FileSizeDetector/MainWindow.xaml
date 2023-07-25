@@ -13,9 +13,9 @@
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontSize" Value="36" />
         </Style>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converters:ByteToMegaByteStringConverter x:Key="ByteToMegaByteStringConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />      
         <converters:ByteToGigaByteStringConverter x:Key="ByteToGigaByteStringConverter" />
+        <converters:ByteToPercentConverter x:Key="ByteToPercentConverter" />
         <converters:PathToNameConverter x:Key="PathToNameConverter" />
 
         <HierarchicalDataTemplate DataType="{x:Type local:FolderOrFile}" ItemsSource="{Binding Children}">
@@ -31,18 +31,17 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-                <TextBlock Text="{Binding Size, Converter={StaticResource ByteToMegaByteStringConverter}}" Margin="5">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsFolder}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
+                <TextBlock Text="{Binding Size, Converter={StaticResource ByteToGigaByteStringConverter}}" Margin="5"/>
+
+                <TextBlock Margin="5" Foreground="#FFFF2A2A">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource ByteToPercentConverter}">
+                            <Binding Path="SizeOfDrive" RelativeSource="{RelativeSource AncestorType=local:MainWindow}" />
+                            <Binding Path="Size" />
+                        </MultiBinding>
+                    </TextBlock.Text>
                 </TextBlock>
-                <TextBlock Text="{Binding Size, Converter={StaticResource ByteToGigaByteStringConverter}}" Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}}" Margin="5"/>
+
             </StackPanel>
         </HierarchicalDataTemplate>
     </Window.Resources>
@@ -58,7 +57,6 @@
                 <RowDefinition Height="80"/>
                 <RowDefinition Height="80"/>
             </Grid.RowDefinitions>
-
             <Label Grid.Row="0" Content="Select drive:" Margin="10" />
             <ComboBox Name="drive_cbox"  Grid.Row="1" Margin="10" />
             <Button Name="start_btn"  Grid.Row="2" Content="Start" Click="start_btn_Click"  Margin="10"/>
@@ -72,6 +70,5 @@
             <Button x:Name="orderBy_btn" Content="Order by size" Margin="10" Click="orderBy_btn_Click"></Button>
             <TreeView Name="treeView" Grid.Row="1" FontSize="16"/>
         </Grid>
-
     </Grid>
 </Window>

@@ -16,9 +16,9 @@ namespace FileSizeDetector.Converters
             {
                 var mbvalue = (double)longValue / 1048576;
                 if (mbvalue > 400)
-                    return $"{(double)longValue / 1073741824} GB";
+                    return $"{((double)longValue / 1073741824).ToString("0.00")} GB";
                 else
-                    return $"{mbvalue} MB";
+                    return $"{mbvalue.ToString("0.00")} MB";
             }
             else
                 return "unknown";

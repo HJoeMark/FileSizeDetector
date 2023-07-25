@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,10 +29,28 @@ namespace FileSizeDetector
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         int MAX_LEVEL = 100;
         List<FolderOrFile>? folderOrFiles;
+
+        private long sizeOfDrive;
+
+        public long SizeOfDrive
+        {
+            get { return sizeOfDrive; }
+            set
+            {
+                sizeOfDrive = value;
+                OnPropertyChanged("SizeOfDrive");
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public MainWindow()
         {
@@ -57,17 +77,25 @@ namespace FileSizeDetector
             {
                 Task.Factory.StartNew(() =>
                 {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+
                     folderOrFiles = Search(startPath, 0, out long rootSize);
+                    SizeOfDrive = rootSize;
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         treeView.ItemsSource = folderOrFiles;
                         SetStatus(Status.Completed);
                     });
+
+                    stopwatch.Stop();
+                    TimeSpan elapsedTime = stopwatch.Elapsed;
+                    MessageBox.Show($"Elapsed time: {elapsedTime.Minutes} minutes and {elapsedTime.Seconds} seconds");
                 });
             }
             else
                 MessageBox.Show("Drive must be selected!");
-            //MessageBox.Show("The searching task is started!");
+
             SetStatus(Status.Started);
         }
 
@@ -88,15 +116,18 @@ namespace FileSizeDetector
                 foreach (var filePath in Directory.GetFiles(startPath))
                 {
                     FileInfo fileInfo = new FileInfo(filePath);
-                    result.Add(new FolderOrFile(false, fileInfo.FullName, fileInfo.Length, null));
-                    filesSize += fileInfo.Length;
+                    string fileName = fileInfo.FullName;
+                    long fileLength = fileInfo.Length;
+                    result.Add(new FolderOrFile(false, fileName, fileLength, null));
+                    filesSize += fileLength;
                 }
 
                 foreach (var directoryPath in Directory.GetDirectories(startPath))
                 {
                     DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
                     var children = Search(directoryPath, level + 1, out long childrenSize);
-                    result.Add(new FolderOrFile(true, directoryInfo.FullName, childrenSize, children));
+                    string directoryFullName = directoryInfo.FullName;
+                    result.Add(new FolderOrFile(true, directoryFullName, childrenSize, children));
                     directoriesSize += childrenSize;
                 }
 
@@ -107,7 +138,6 @@ namespace FileSizeDetector
                 _childrenSize = 0;
                 return null;
             }
-
 
             return result.Count > 0 ? result : null;
         }
@@ -147,30 +177,24 @@ namespace FileSizeDetector
             treeView.ItemsSource = OrderBySize(folderOrFiles);
         }
 
-        private List<FolderOrFile>? OrderBySize(List<FolderOrFile>? folderOrFiles)
+        private List<FolderOrFile> OrderBySize(List<FolderOrFile> folderOrFiles)
         {
-            List<FolderOrFile>? result = new List<FolderOrFile>();
+            List<FolderOrFile> result = new List<FolderOrFile>();
 
             if (folderOrFiles == null)
                 return result;
             else
             {
-                result = folderOrFiles.OrderBy(x => x.Size).ToList();
+                result = folderOrFiles.OrderByDescending(x => x.Size).ToList();
 
-                //foreach (FolderOrFile? folderOrFile in folderOrFiles)
-                //{
-                //    if (folderOrFile != null && folderOrFile.IsFolder)
-                //    {
-                //        var orderedFolderOrFiles = OrderBySize(folderOrFiles);
-                //        if (orderedFolderOrFiles != null)
-                //            result.AddRange(orderedFolderOrFiles);
-                //    }
-                //    else if (folderOrFile != null)
-                //        result.Add(folderOrFile);
-                //}
+                foreach (FolderOrFile? folderOrFile in result)
+                {
+                    if (folderOrFile != null && folderOrFile.IsFolder && folderOrFile.Children != null)
+                        folderOrFile.Children = OrderBySize(folderOrFile.Children);
+                }
             }
 
-            return result.Count() > 0 ? result : null;
+            return result;
         }
     }
 }
